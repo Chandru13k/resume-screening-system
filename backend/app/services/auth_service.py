@@ -11,8 +11,10 @@ from app.repositories.user_repository import UserRepository
 from app.schemas.auth import (
     CandidateRegisterRequest,
     RecruiterRegisterRequest,
+    TokenResponse,
 )
-from app.security.password import hash_password
+from app.security.jwt import create_access_token
+from app.security.password import hash_password, verify_password
 
 
 class AuthService:
@@ -24,31 +26,49 @@ class AuthService:
         self.candidate_repo = CandidateRepository(db)
         self.recruiter_repo = RecruiterRepository(db)
 
-    # -----------------------------
+    # --------------------------------------------------
+    # Private Helper
+    # --------------------------------------------------
+    def _create_user(
+        self,
+        email: str,
+        password: str,
+        role: UserRole,
+    ) -> User:
+
+        existing = self.user_repo.get_by_email(email)
+
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Email already registered.",
+            )
+
+        user = User(
+            email=email,
+            password_hash=hash_password(password),
+            role=role,
+        )
+
+        self.user_repo.create(user)
+
+        return user
+
+    # --------------------------------------------------
     # Candidate Registration
-    # -----------------------------
+    # --------------------------------------------------
     def register_candidate(
         self,
         data: CandidateRegisterRequest,
     ) -> User:
 
-        existing = self.user_repo.get_by_email(data.email)
-
-        if existing:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Email already registered."
-            )
-
         try:
 
-            user = User(
+            user = self._create_user(
                 email=data.email,
-                password_hash=hash_password(data.password),
+                password=data.password,
                 role=UserRole.CANDIDATE,
             )
-
-            self.user_repo.create(user)
 
             profile = CandidateProfile(
                 user_id=user.id,
@@ -73,31 +93,21 @@ class AuthService:
             self.db.rollback()
             raise
 
-    # -----------------------------
+    # --------------------------------------------------
     # Recruiter Registration
-    # -----------------------------
+    # --------------------------------------------------
     def register_recruiter(
         self,
         data: RecruiterRegisterRequest,
     ) -> User:
 
-        existing = self.user_repo.get_by_email(data.email)
-
-        if existing:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Email already registered."
-            )
-
         try:
 
-            user = User(
+            user = self._create_user(
                 email=data.email,
-                password_hash=hash_password(data.password),
+                password=data.password,
                 role=UserRole.RECRUITER,
             )
-
-            self.user_repo.create(user)
 
             profile = RecruiterProfile(
                 user_id=user.id,
@@ -118,3 +128,42 @@ class AuthService:
         except Exception:
             self.db.rollback()
             raise
+
+# --------------------------------------------------
+# Login
+# --------------------------------------------------
+    def login(
+        self,
+        email: str,
+        password: str,
+    ) -> TokenResponse:
+
+        user = self.user_repo.get_by_email(email)
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password.",
+            )
+
+        if not verify_password(
+            password,
+            user.password_hash,
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password.",
+            )
+
+        access_token = create_access_token(
+            {
+                "sub": user.email,
+                "uid": user.id,
+                "role": user.role,
+            }
+        )
+
+        return TokenResponse(
+            access_token=access_token,
+            token_type="bearer",
+        )

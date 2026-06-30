@@ -8,7 +8,7 @@ from app.core.config import settings
 
 def create_access_token(data: dict[str, Any]) -> str:
     """
-    Create a JWT access token.
+    Create JWT access token.
     """
 
     to_encode = data.copy()
@@ -17,7 +17,13 @@ def create_access_token(data: dict[str, Any]) -> str:
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
 
-    to_encode.update({"exp": expire})
+    # Standard JWT Claims
+    to_encode.update(
+        {
+            "exp": expire,
+            "type": "access",
+        }
+    )
 
     return jwt.encode(
         to_encode,
@@ -28,7 +34,7 @@ def create_access_token(data: dict[str, Any]) -> str:
 
 def verify_access_token(token: str) -> dict[str, Any]:
     """
-    Verify and decode a JWT token.
+    Verify and decode JWT access token.
     """
 
     try:
