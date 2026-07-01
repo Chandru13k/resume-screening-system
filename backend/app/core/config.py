@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     # Qdrant
     QDRANT_HOST: str
     QDRANT_PORT: int
+    QDRANT_URL: str = "http://localhost:6333"
 
     # Gemini
     GEMINI_API_KEY: str = ""
