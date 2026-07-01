@@ -1,0 +1,7 @@
+from app.services.auth_service import AuthService
+
+from app.services.job_service import JobService
+
+from app.services.resume_service import ResumeService
+
+from app.services.matching_service import MatchingService

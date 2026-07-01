@@ -3,10 +3,12 @@ from sqlalchemy.orm import Session
 
 from app.models.job import Job
 from app.repositories.job_repository import JobRepository
+from app.repositories.job_skill_repository import JobSkillRepository
 from app.schemas.job import (
     JobCreateRequest,
     JobUpdateRequest,
 )
+from app.services.job_parser_service import JobParserService
 
 
 class JobService:
@@ -14,6 +16,7 @@ class JobService:
     def __init__(self, db: Session):
         self.db = db
         self.job_repo = JobRepository(db)
+        self.job_skill_repo = JobSkillRepository(db)
 
     # --------------------------------------------------
     # Create Job
@@ -25,6 +28,7 @@ class JobService:
     ) -> Job:
 
         try:
+
             job = Job(
                 recruiter_id=recruiter_id,
                 title=data.title,
@@ -41,7 +45,18 @@ class JobService:
             )
 
             self.job_repo.create(job)
+
+            skills = JobParserService.extract_skills(
+                data.description
+            )
+
+            self.job_skill_repo.create_many(
+                job.id,
+                skills,
+            )
+
             self.db.commit()
+
             self.db.refresh(job)
 
             return job
@@ -51,7 +66,19 @@ class JobService:
             raise
 
     # --------------------------------------------------
-    # Get Job
+    # Get All Recruiter Jobs
+    # --------------------------------------------------
+    def get_jobs(
+        self,
+        recruiter_id: int,
+    ):
+
+        return self.job_repo.get_by_recruiter(
+            recruiter_id
+        )
+
+    # --------------------------------------------------
+    # Get One Job
     # --------------------------------------------------
     def get_job(
         self,
@@ -76,16 +103,6 @@ class JobService:
         return job
 
     # --------------------------------------------------
-    # Get Recruiter's Jobs
-    # --------------------------------------------------
-    def get_recruiter_jobs(
-        self,
-        recruiter_id: int,
-    ) -> list[Job]:
-
-        return self.job_repo.get_by_recruiter(recruiter_id)
-
-    # --------------------------------------------------
     # Update Job
     # --------------------------------------------------
     def update_job(
@@ -96,16 +113,19 @@ class JobService:
     ) -> Job:
 
         job = self.get_job(
-            job_id=job_id,
-            recruiter_id=recruiter_id,
+            job_id,
+            recruiter_id,
         )
 
-        update_data = data.model_dump(exclude_unset=True)
+        update_data = data.model_dump(
+            exclude_unset=True
+        )
 
-        for field, value in update_data.items():
-            setattr(job, field, value)
+        for key, value in update_data.items():
+            setattr(job, key, value)
 
         self.db.commit()
+
         self.db.refresh(job)
 
         return job
@@ -117,12 +137,13 @@ class JobService:
         self,
         job_id: int,
         recruiter_id: int,
-    ) -> None:
+    ):
 
         job = self.get_job(
-            job_id=job_id,
-            recruiter_id=recruiter_id,
+            job_id,
+            recruiter_id,
         )
 
-        self.job_repo.delete(job)
+        self.db.delete(job)
+
         self.db.commit()
