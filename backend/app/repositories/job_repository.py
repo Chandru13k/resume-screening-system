@@ -9,27 +9,90 @@ class JobRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create(self, job: Job) -> Job:
+    # --------------------------------------------------
+    # Create
+    # --------------------------------------------------
+
+    def create(
+        self,
+        job: Job,
+    ) -> Job:
+
         self.db.add(job)
+
         self.db.flush()
+
         self.db.refresh(job)
+
         return job
 
-    def get_by_id(self, job_id: int) -> Job | None:
-        statement = select(Job).where(Job.id == job_id)
-        return self.db.scalar(statement)
+    # --------------------------------------------------
+    # Get By ID
+    # --------------------------------------------------
 
-    def get_all(self) -> list[Job]:
-        statement = select(Job).order_by(Job.created_at.desc())
-        return list(self.db.scalars(statement))
+    def get_by_id(
+        self,
+        job_id: int,
+    ) -> Job | None:
 
-    def get_by_recruiter(self, recruiter_id: int) -> list[Job]:
         statement = (
             select(Job)
-            .where(Job.recruiter_id == recruiter_id)
-            .order_by(Job.created_at.desc())
+            .where(Job.id == job_id)
         )
-        return list(self.db.scalars(statement))
 
-    def delete(self, job: Job) -> None:
+        return self.db.scalar(statement)
+
+    # --------------------------------------------------
+    # Recruiter Jobs
+    # --------------------------------------------------
+
+    def get_by_recruiter(
+        self,
+        recruiter_id: int,
+    ) -> list[Job]:
+
+        statement = (
+            select(Job)
+            .where(
+                Job.recruiter_id == recruiter_id
+            )
+            .order_by(
+                Job.created_at.desc()
+            )
+        )
+
+        return list(
+            self.db.scalars(statement)
+        )
+
+    # --------------------------------------------------
+    # Public Jobs
+    # --------------------------------------------------
+
+    def get_active_jobs(self) -> list[Job]:
+
+        statement = (
+            select(Job)
+            .where(
+                Job.is_active.is_(True),
+                Job.status == "OPEN",
+            )
+            .order_by(
+                Job.created_at.desc()
+            )
+        )
+
+        return list(
+            self.db.scalars(statement)
+        )
+
+    # --------------------------------------------------
+    # Delete
+    # --------------------------------------------------
+
+    def delete(
+        self,
+        job: Job,
+    ):
+
         self.db.delete(job)

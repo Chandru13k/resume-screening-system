@@ -1,5 +1,13 @@
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
+from app.schemas.application import (
+    ApplyJobRequest,
+    ApplyJobResponse,
+)
+
+from app.services.application_service import (
+    ApplicationService,
+)
 
 from app.database.session import get_db
 from app.models.user import User
@@ -8,7 +16,10 @@ from app.schemas.job import (
     JobResponse,
     JobUpdateRequest,
 )
-from app.security.dependencies import require_recruiter
+from app.security.dependencies import (
+    require_candidate,
+    require_recruiter,
+)
 from app.services.job_service import JobService
 
 router = APIRouter(
@@ -16,7 +27,50 @@ router = APIRouter(
     tags=["Jobs"],
 )
 
+# --------------------------------------------------
+# Browse Public Jobs (Candidate)
+# --------------------------------------------------
 
+@router.get(
+    "/public",
+    response_model=list[JobResponse],
+)
+def browse_jobs(
+    current_user: User = Depends(
+        require_candidate,
+    ),
+    db: Session = Depends(get_db),
+):
+
+    service = JobService(db)
+
+    return service.get_public_jobs()
+
+# --------------------------------------------------
+# Apply Job
+# --------------------------------------------------
+
+@router.post(
+    "/{job_id}/apply",
+    response_model=ApplyJobResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def apply_job(
+    job_id: int,
+    request: ApplyJobRequest,
+    current_user: User = Depends(
+        require_candidate,
+    ),
+    db: Session = Depends(get_db),
+):
+
+    service = ApplicationService(db)
+
+    return service.apply_to_job(
+        job_id=job_id,
+        candidate_id=current_user.id,
+        resume_id=request.resume_id,
+    )
 # --------------------------------------------------
 # Create Job
 # --------------------------------------------------
@@ -51,10 +105,9 @@ def get_my_jobs(
 ):
     service = JobService(db)
 
-    return service.get_recruiter_jobs(
+    return service.get_jobs(
         recruiter_id=current_user.id,
     )
-
 
 # --------------------------------------------------
 # Get Single Job

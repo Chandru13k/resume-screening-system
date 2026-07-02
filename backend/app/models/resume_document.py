@@ -47,4 +47,11 @@ class ResumeDocument(Base, TimestampMixin):
         nullable=False,
     )
 
-    candidate = relationship("User")
+    candidate = relationship(
+        "User"
+    )
+
+    applications = relationship(
+        "Application",
+        cascade="all, delete-orphan",
+    )

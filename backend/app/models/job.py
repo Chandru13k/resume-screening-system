@@ -94,4 +94,11 @@ class Job(Base, TimestampMixin):
         server_default=sa.true(),
     )
 
-    recruiter = relationship("User")
+    recruiter = relationship(
+        "User"
+    )
+
+    applications = relationship(
+        "Application",
+        cascade="all, delete-orphan",
+    )

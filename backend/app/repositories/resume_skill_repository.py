@@ -9,30 +9,36 @@ class ResumeSkillRepository:
     def __init__(self, db: Session):
         self.db = db
 
+    def create(self, resume_skill: ResumeSkill) -> ResumeSkill:
+        self.db.add(resume_skill)
+        self.db.flush()
+        self.db.refresh(resume_skill)
+        return resume_skill
+
     def create_many(
         self,
         resume_id: int,
         skills: list[str],
-    ):
+    ) -> None:
 
-        for skill in skills:
+        # Remove duplicates while preserving order
+        unique_skills = list(dict.fromkeys(skills))
 
+        for skill in unique_skills:
             self.db.add(
-
                 ResumeSkill(
                     resume_id=resume_id,
                     skill=skill,
                 )
-
             )
 
-    def get_by_resume(
+    def get_skills(
         self,
         resume_id: int,
-    ) -> list[ResumeSkill]:
+    ) -> list[str]:
 
         statement = (
-            select(ResumeSkill)
+            select(ResumeSkill.skill)
             .where(
                 ResumeSkill.resume_id == resume_id
             )
@@ -41,6 +47,4 @@ class ResumeSkillRepository:
             )
         )
 
-        return list(
-            self.db.scalars(statement)
-        )
+        return list(self.db.scalars(statement))

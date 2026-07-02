@@ -13,3 +13,5 @@ from app.models.resume_document import ResumeDocument
 from app.models.resume_skill import ResumeSkill
 
 from app.models.candidate_job_match import CandidateJobMatch
+
+from app.models.application import Application
