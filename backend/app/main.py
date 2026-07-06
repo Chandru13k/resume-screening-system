@@ -12,10 +12,22 @@ from app.api.v1.endpoints.job_analytics import router as job_analytics_router
 from app.api.v1.endpoints.candidate_dashboard import (
     router as candidate_dashboard_router,
 )
+
 from app.api.v1.endpoints.recommendation import (
     router as recommendation_router,
 )
 
+from app.api.v1.endpoints.application import (
+    router as application_router,
+)
+
+from app.api.v1.endpoints.application_ranking import (
+    router as application_ranking_router,
+)
+
+from app.api.v1.endpoints.recruiter_job_dashboard import (
+    router as recruiter_job_dashboard_router,
+)
 
 app = FastAPI(
     title="Resume Screening System API",
@@ -29,12 +41,17 @@ app.include_router(matching_router)
 app.include_router(ranking_router)
 app.include_router(dashboard_router)
 app.include_router(job_analytics_router)
+app.include_router(candidate_dashboard_router)
+app.include_router(recommendation_router)
+app.include_router(application_ranking_router)
 app.include_router(
-    candidate_dashboard_router
+    recruiter_job_dashboard_router
 )
-app.include_router(
-    recommendation_router
-)
+
+# -------------------------
+# Applications
+# -------------------------
+app.include_router(application_router)
 
 
 @app.get("/")

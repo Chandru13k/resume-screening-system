@@ -17,7 +17,7 @@ class ApplicationService:
         self.resume_repo = ResumeRepository(db)
 
     # --------------------------------------------------
-    # Apply to Job
+    # Apply
     # --------------------------------------------------
 
     def apply_to_job(
@@ -25,7 +25,7 @@ class ApplicationService:
         job_id: int,
         candidate_id: int,
         resume_id: int,
-    ) -> Application:
+    ):
 
         job = self.job_repo.get_by_id(job_id)
 
@@ -38,7 +38,7 @@ class ApplicationService:
         if not job.is_active:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Job is no longer accepting applications.",
+                detail="Job is closed.",
             )
 
         resume = self.resume_repo.get_by_id(resume_id)
@@ -52,12 +52,12 @@ class ApplicationService:
         if resume.candidate_id != candidate_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You can only apply using your own resume.",
+                detail="Invalid resume.",
             )
 
         existing = self.application_repo.get_by_job_and_candidate(
-            job_id=job_id,
-            candidate_id=candidate_id,
+            job_id,
+            candidate_id,
         )
 
         if existing:
@@ -73,15 +73,17 @@ class ApplicationService:
             status=ApplicationStatus.APPLIED,
         )
 
-        try:
-            self.application_repo.create(application)
-            self.db.commit()
-            self.db.refresh(application)
-            return application
+        self.application_repo.create(application)
 
-        except Exception:
-            self.db.rollback()
-            raise
+        self.db.commit()
+
+        self.db.refresh(application)
+
+        return {
+            "application_id": application.id,
+            "status": application.status,
+            "message": "Application submitted successfully.",
+        }
 
     # --------------------------------------------------
     # Candidate Applications
@@ -91,12 +93,16 @@ class ApplicationService:
         self,
         candidate_id: int,
     ):
-        applications = self.application_repo.get_by_candidate(candidate_id)
 
-        result = []
+        applications = self.application_repo.get_by_candidate(
+            candidate_id
+        )
+
+        response = []
 
         for application in applications:
-            result.append(
+
+            response.append(
                 {
                     "application_id": application.id,
                     "job_id": application.job.id,
@@ -108,7 +114,7 @@ class ApplicationService:
                 }
             )
 
-        return result
+        return response
 
     # --------------------------------------------------
     # Recruiter Applications
@@ -119,6 +125,7 @@ class ApplicationService:
         recruiter_id: int,
         job_id: int,
     ):
+
         job = self.job_repo.get_by_id(job_id)
 
         if not job:
@@ -133,7 +140,29 @@ class ApplicationService:
                 detail="Access denied.",
             )
 
-        return self.application_repo.get_by_job(job_id)
+        applications = self.application_repo.get_by_job(
+            job_id
+        )
+
+        response = []
+
+        for application in applications:
+
+            profile = application.candidate.candidate_profile
+
+            response.append(
+                {
+                    "application_id": application.id,
+                    "candidate_id": application.candidate.id,
+                    "candidate_name": profile.full_name,
+                    "candidate_email": application.candidate.email,
+                    "resume_id": application.resume.id,
+                    "status": application.status,
+                    "applied_at": application.applied_at,
+                }
+            )
+
+        return response
 
     # --------------------------------------------------
     # Update Status
@@ -145,7 +174,10 @@ class ApplicationService:
         application_id: int,
         status_value: ApplicationStatus,
     ):
-        application = self.application_repo.get_by_id(application_id)
+
+        application = self.application_repo.get_by_id(
+            application_id
+        )
 
         if not application:
             raise HTTPException(
@@ -159,17 +191,17 @@ class ApplicationService:
                 detail="Access denied.",
             )
 
-        try:
-            self.application_repo.update_status(application, status_value)
-            self.db.commit()
-            self.db.refresh(application)
+        self.application_repo.update_status(
+            application,
+            status_value,
+        )
 
-            return {
-                "application_id": application.id,
-                "status": application.status,
-                "message": "Application submitted successfully.",
-            }
+        self.db.commit()
 
-        except Exception:
-            self.db.rollback()
-            raise
+        self.db.refresh(application)
+
+        return {
+            "application_id": application.id,
+            "status": application.status,
+            "message": "Application status updated successfully.",
+        }

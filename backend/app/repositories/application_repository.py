@@ -90,9 +90,9 @@ class ApplicationRepository:
             select(Application)
             .where(Application.job_id == job_id)
             .options(
-                joinedload(Application.resume),
                 joinedload(Application.job),
-                joinedload(Application.candidate).joinedload("candidate_profile"),
+                joinedload(Application.resume),
+                joinedload(Application.candidate),
             )
             .order_by(Application.applied_at.desc())
         )

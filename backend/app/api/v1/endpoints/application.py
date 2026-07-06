@@ -6,8 +6,11 @@ from app.models.user import User
 
 from app.schemas.application import (
     ApplyJobRequest,
-    ApplicationResponse,
+    ApplyJobResponse,
+    CandidateApplicationResponse,
+    RecruiterApplicationResponse,
     UpdateApplicationStatusRequest,
+    UpdateApplicationStatusResponse,
 )
 
 from app.schemas.job import JobResponse
@@ -39,9 +42,7 @@ router = APIRouter(
     response_model=list[JobResponse],
 )
 def browse_jobs(
-    current_user: User = Depends(
-        require_candidate
-    ),
+    current_user: User = Depends(require_candidate),
     db: Session = Depends(get_db),
 ):
 
@@ -54,15 +55,13 @@ def browse_jobs(
 
 @router.post(
     "/jobs/{job_id}/apply",
-    response_model=ApplicationResponse,
+    response_model=ApplyJobResponse,
     status_code=status.HTTP_201_CREATED,
 )
 def apply_job(
     job_id: int,
     request: ApplyJobRequest,
-    current_user: User = Depends(
-        require_candidate
-    ),
+    current_user: User = Depends(require_candidate),
     db: Session = Depends(get_db),
 ):
 
@@ -81,19 +80,17 @@ def apply_job(
 
 @router.get(
     "/candidate/applications",
-    response_model=list[ApplicationResponse],
+    response_model=list[CandidateApplicationResponse],
 )
-def my_applications(
-    current_user: User = Depends(
-        require_candidate
-    ),
+def get_my_applications(
+    current_user: User = Depends(require_candidate),
     db: Session = Depends(get_db),
 ):
 
     service = ApplicationService(db)
 
     return service.get_candidate_applications(
-        current_user.id
+        current_user.id,
     )
 
 
@@ -103,13 +100,11 @@ def my_applications(
 
 @router.get(
     "/jobs/{job_id}/applications",
-    response_model=list[ApplicationResponse],
+    response_model=list[RecruiterApplicationResponse],
 )
-def recruiter_applications(
+def get_job_applications(
     job_id: int,
-    current_user: User = Depends(
-        require_recruiter
-    ),
+    current_user: User = Depends(require_recruiter),
     db: Session = Depends(get_db),
 ):
 
@@ -127,14 +122,12 @@ def recruiter_applications(
 
 @router.patch(
     "/applications/{application_id}/status",
-    response_model=ApplicationResponse,
+    response_model=UpdateApplicationStatusResponse,
 )
 def update_application_status(
     application_id: int,
     request: UpdateApplicationStatusRequest,
-    current_user: User = Depends(
-        require_recruiter
-    ),
+    current_user: User = Depends(require_recruiter),
     db: Session = Depends(get_db),
 ):
 

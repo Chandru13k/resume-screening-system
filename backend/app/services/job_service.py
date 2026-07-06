@@ -9,6 +9,7 @@ from app.schemas.job import (
     JobUpdateRequest,
 )
 from app.services.job_parser_service import JobParserService
+from app.ai.skill_normalizer import normalize
 
 
 class JobService:
@@ -28,7 +29,6 @@ class JobService:
     ) -> Job:
 
         try:
-
             job = Job(
                 recruiter_id=recruiter_id,
                 title=data.title,
@@ -46,8 +46,11 @@ class JobService:
 
             self.job_repo.create(job)
 
-            skills = JobParserService.extract_skills(
-                data.description
+            # Normalize skills before saving
+            skills = normalize(
+                JobParserService.extract_skills(
+                    data.description
+                )
             )
 
             self.job_skill_repo.create_many(
@@ -56,7 +59,6 @@ class JobService:
             )
 
             self.db.commit()
-
             self.db.refresh(job)
 
             return job
@@ -72,10 +74,7 @@ class JobService:
         self,
         recruiter_id: int,
     ):
-
-        return self.job_repo.get_by_recruiter(
-            recruiter_id
-        )
+        return self.job_repo.get_by_recruiter(recruiter_id)
 
     # --------------------------------------------------
     # Get One Job
@@ -101,16 +100,15 @@ class JobService:
             )
 
         return job
-    
+
     # --------------------------------------------------
     # Browse Public Jobs
     # --------------------------------------------------
-
     def get_public_jobs(
         self,
     ):
-
         return self.job_repo.get_active_jobs()
+
     # --------------------------------------------------
     # Update Job
     # --------------------------------------------------
@@ -121,20 +119,14 @@ class JobService:
         data: JobUpdateRequest,
     ) -> Job:
 
-        job = self.get_job(
-            job_id,
-            recruiter_id,
-        )
+        job = self.get_job(job_id, recruiter_id)
 
-        update_data = data.model_dump(
-            exclude_unset=True
-        )
+        update_data = data.model_dump(exclude_unset=True)
 
         for key, value in update_data.items():
             setattr(job, key, value)
 
         self.db.commit()
-
         self.db.refresh(job)
 
         return job
@@ -147,12 +139,6 @@ class JobService:
         job_id: int,
         recruiter_id: int,
     ):
-
-        job = self.get_job(
-            job_id,
-            recruiter_id,
-        )
-
+        job = self.get_job(job_id, recruiter_id)
         self.db.delete(job)
-
         self.db.commit()
