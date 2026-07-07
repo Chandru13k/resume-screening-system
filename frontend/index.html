@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Screening System</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">RS</div>
+          <div>
+            <h1>Resume Screening</h1>
+            <p>AI-assisted hiring workspace</p>
+          </div>
+        </div>
+        <nav class="topnav">
+          <a href="#overview">Overview</a>
+          <a href="#workflow">Workflow</a>
+          <a href="#dashboard">Dashboard</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero" id="overview">
+          <div>
+            <p class="eyebrow">Draft UI preview</p>
+            <h2>Modern hiring flows for candidates and recruiters.</h2>
+            <p>
+              A simple, polished interface for profile creation, resume upload,
+              job posting, matching, and application tracking.
+            </p>
+            <div class="hero-actions">
+              <button class="primary">Get started</button>
+              <button class="secondary">View workflow</button>
+            </div>
+          </div>
+          <div class="hero-card">
+            <h3>Live project status</h3>
+            <ul>
+              <li>✔ Backend workflow verified</li>
+              <li>✔ Auth, jobs, and applications work</li>
+              <li>✔ Resume upload flow is live</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="switcher" id="workflow">
+          <div class="switcher-header">
+            <h3>Choose a view</h3>
+            <div class="toggle-group">
+              <button class="toggle active" data-view="candidate">Candidate</button>
+              <button class="toggle" data-view="recruiter">Recruiter</button>
+            </div>
+          </div>
+
+          <div class="view-card candidate-view active">
+            <div class="panel">
+              <h4>Candidate portal</h4>
+              <form class="stack">
+                <input type="text" placeholder="Full name" />
+                <input type="email" placeholder="Email" />
+                <input type="text" placeholder="Location" />
+                <button class="primary">Create profile</button>
+              </form>
+            </div>
+            <div class="panel">
+              <h4>Resume & applications</h4>
+              <div class="card-list">
+                <div class="mini-card">
+                  <strong>Upload resume</strong>
+                  <p>PDF or DOCX support</p>
+                </div>
+                <div class="mini-card">
+                  <strong>Saved resumes</strong>
+                  <p>2 documents</p>
+                </div>
+                <div class="mini-card">
+                  <strong>Applications</strong>
+                  <p>3 active</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="view-card recruiter-view">
+            <div class="panel">
+              <h4>Recruiter workspace</h4>
+              <form class="stack">
+                <input type="text" placeholder="Company name" />
+                <input type="text" placeholder="Job title" />
+                <textarea rows="4" placeholder="Job description"></textarea>
+                <button class="primary">Post job</button>
+              </form>
+            </div>
+            <div class="panel">
+              <h4>Hiring dashboard</h4>
+              <div class="card-list">
+                <div class="mini-card">
+                  <strong>Open jobs</strong>
+                  <p>4 currently live</p>
+                </div>
+                <div class="mini-card">
+                  <strong>Applicants</strong>
+                  <p>12 shortlisted</p>
+                </div>
+                <div class="mini-card">
+                  <strong>AI insights</strong>
+                  <p>Ranked matches ready</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="dashboard" id="dashboard">
+          <div class="panel wide">
+            <div class="panel-head">
+              <h3>Suggested jobs</h3>
+              <span class="pill">Personalized</span>
+            </div>
+            <div class="job-list">
+              <article class="job-item">
+                <div>
+                  <h4>Senior Backend Engineer</h4>
+                  <p>Remote • FastAPI • Python</p>
+                </div>
+                <button class="secondary">Apply</button>
+              </article>
+              <article class="job-item">
+                <div>
+                  <h4>Data Platform Engineer</h4>
+                  <p>Hybrid • SQL • ETL</p>
+                </div>
+                <button class="secondary">Apply</button>
+              </article>
+              <article class="job-item">
+                <div>
+                  <h4>Product Analyst</h4>
+                  <p>On-site • Analytics • BI</p>
+                </div>
+                <button class="secondary">Apply</button>
+              </article>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const toggles = document.querySelectorAll('.toggle');
+      const views = document.querySelectorAll('.view-card');
+
+      toggles.forEach((button) => {
+        button.addEventListener('click', () => {
+          toggles.forEach((item) => item.classList.remove('active'));
+          views.forEach((view) => view.classList.remove('active'));
+
+          button.classList.add('active');
+          document.querySelector(`.${button.dataset.view}-view`).classList.add('active');
+        });
+      });
+    </script>
+  </body>
+</html>

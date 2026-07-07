@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from app.api.v1.endpoints.auth import router as auth_router
@@ -36,10 +38,19 @@ from app.api.v1.endpoints.recruiter_job_dashboard import (
 from app.api.v1.endpoints.application_ai import (
     router as application_ai_router,
 )
+from app.database.init_db import init_db
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
 
 app = FastAPI(
     title="Resume Screening System API",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Authentication

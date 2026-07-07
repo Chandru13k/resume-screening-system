@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class CandidateProfileResponse(BaseModel):
@@ -17,9 +17,7 @@ class CandidateProfileResponse(BaseModel):
 
     portfolio_url: str | None
 
-    class Config:
-
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ResumeResponse(BaseModel):
@@ -32,9 +30,7 @@ class ResumeResponse(BaseModel):
 
     created_at: datetime
 
-    class Config:
-
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CandidateDashboardResponse(BaseModel):

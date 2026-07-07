@@ -8,7 +8,7 @@ class IndexingService:
     """
 
     def __init__(self):
-
+        self.embedding_service = EmbeddingService()
         self.vector_store = VectorStore()
 
     def index_resume(
@@ -21,7 +21,7 @@ class IndexingService:
         if not text:
             return
 
-        embedding = EmbeddingService.encode(text)
+        embedding = self.embedding_service.encode(text)
 
         self.vector_store.upsert_resume(
             resume_id=resume_id,
