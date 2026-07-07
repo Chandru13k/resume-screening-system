@@ -78,3 +78,9 @@ class Application(Base):
         "ResumeDocument",
         back_populates="applications",
     )
+    ai_insight = relationship(
+        "ApplicationAIInsight",
+        back_populates="application",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )

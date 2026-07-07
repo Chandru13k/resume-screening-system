@@ -22,3 +22,5 @@ from app.models.resume_skill import ResumeSkill
 from app.models.candidate_job_match import CandidateJobMatch
 
 from app.models.application import Application
+
+from app.models.application_ai_insight import ApplicationAIInsight
