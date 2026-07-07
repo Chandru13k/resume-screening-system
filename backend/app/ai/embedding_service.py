@@ -8,38 +8,21 @@ class EmbeddingService:
 
     MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
-    def __init__(self):
+    # Load model only once
+    model = SentenceTransformer(MODEL_NAME)
 
-        self.model = SentenceTransformer(
-            self.MODEL_NAME
-        )
-
-    # --------------------------------------------------
-    # Single Text
-    # --------------------------------------------------
-
-    def encode(
-        self,
-        text: str,
-    ) -> list[float]:
-
-        embedding = self.model.encode(
+    @staticmethod
+    def encode(text: str) -> list[float]:
+        embedding = EmbeddingService.model.encode(
             text,
             normalize_embeddings=True,
         )
 
         return embedding.tolist()
 
-    # --------------------------------------------------
-    # Multiple Texts
-    # --------------------------------------------------
-
-    def encode_batch(
-        self,
-        texts: list[str],
-    ) -> list[list[float]]:
-
-        embeddings = self.model.encode(
+    @staticmethod
+    def encode_batch(texts: list[str]) -> list[list[float]]:
+        embeddings = EmbeddingService.model.encode(
             texts,
             normalize_embeddings=True,
         )
