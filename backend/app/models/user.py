@@ -54,6 +54,12 @@ class User(Base, TimestampMixin):
         cascade="all, delete-orphan"
     )
 
+    resume_documents = relationship(
+        "ResumeDocument",
+        back_populates="candidate",
+        cascade="all, delete-orphan",
+    )
+
     applications = relationship(
         "Application",
         cascade="all, delete-orphan",
