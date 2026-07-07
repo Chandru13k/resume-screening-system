@@ -1,13 +1,15 @@
 from sqlalchemy import (
+    Boolean,
     ForeignKey,
     Integer,
     String,
     Text,
 )
-
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column,
+    relationship,
+)
 
 from app.database.base import Base
 from app.database.mixins import TimestampMixin
@@ -24,7 +26,10 @@ class ResumeDocument(Base, TimestampMixin):
     )
 
     candidate_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
         index=True,
     )
@@ -36,8 +41,8 @@ class ResumeDocument(Base, TimestampMixin):
 
     stored_filename: Mapped[str] = mapped_column(
         String(255),
-        nullable=False,
         unique=True,
+        nullable=False,
     )
 
     file_path: Mapped[str] = mapped_column(
@@ -66,4 +71,19 @@ class ResumeDocument(Base, TimestampMixin):
         nullable=True,
     )
 
-    user = relationship("User")
+    parsing_completed: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False,
+    )
+
+    candidate = relationship(
+        "User",
+        back_populates="resume_documents",
+    )
+
+    applications = relationship(
+        "Application",
+        back_populates="resume",
+        cascade="all, delete-orphan",
+    )

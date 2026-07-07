@@ -1,0 +1,11 @@
+from app.repositories.user_repository import UserRepository
+from app.repositories.candidate_repository import CandidateRepository
+from app.repositories.recruiter_repository import RecruiterRepository
+
+from app.repositories.job_repository import JobRepository
+from app.repositories.job_skill_repository import JobSkillRepository
+
+from app.repositories.resume_repository import ResumeRepository
+from app.repositories.resume_skill_repository import ResumeSkillRepository
+
+from app.repositories.matching_repository import MatchingRepository

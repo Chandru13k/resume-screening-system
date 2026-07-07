@@ -44,12 +44,11 @@ def get_current_user(
 
     return user
 
-
 def require_candidate(
     current_user: User = Depends(get_current_user),
 ) -> User:
 
-    if current_user.role != "candidate":
+    if current_user.role != UserRole.CANDIDATE:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Candidate access only.",
@@ -62,7 +61,7 @@ def require_recruiter(
     current_user: User = Depends(get_current_user),
 ) -> User:
 
-    if current_user.role != "recruiter":
+    if current_user.role != UserRole.RECRUITER:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Recruiter access only.",
@@ -75,7 +74,7 @@ def require_admin(
     current_user: User = Depends(get_current_user),
 ) -> User:
 
-    if current_user.role != "admin":
+    if current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access only.",

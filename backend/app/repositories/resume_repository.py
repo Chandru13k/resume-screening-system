@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.resume_document import ResumeDocument
@@ -5,9 +6,15 @@ from app.models.resume_document import ResumeDocument
 
 class ResumeRepository:
 
-    def __init__(self, db: Session):
-
+    def __init__(
+        self,
+        db: Session,
+    ):
         self.db = db
+
+    # ----------------------------------------
+    # Create
+    # ----------------------------------------
 
     def create(
         self,
@@ -15,35 +22,59 @@ class ResumeRepository:
     ) -> ResumeDocument:
 
         self.db.add(resume)
-
         self.db.flush()
-
         self.db.refresh(resume)
 
         return resume
+
+    # ----------------------------------------
+    # Get By ID
+    # ----------------------------------------
 
     def get_by_id(
         self,
         resume_id: int,
     ) -> ResumeDocument | None:
 
-        return self.db.get(
-            ResumeDocument,
-            resume_id,
+        statement = (
+            select(ResumeDocument)
+            .where(
+                ResumeDocument.id == resume_id
+            )
         )
+
+        return self.db.scalar(statement)
+
+    # ----------------------------------------
+    # Get Candidate Resumes
+    # ----------------------------------------
 
     def get_by_candidate(
         self,
         candidate_id: int,
     ) -> list[ResumeDocument]:
 
-        return (
-            self.db.query(ResumeDocument)
-            .filter(
+        statement = (
+            select(ResumeDocument)
+            .where(
                 ResumeDocument.candidate_id == candidate_id
             )
             .order_by(
                 ResumeDocument.created_at.desc()
             )
-            .all()
         )
+
+        return list(
+            self.db.scalars(statement)
+        )
+
+    # ----------------------------------------
+    # Delete
+    # ----------------------------------------
+
+    def delete(
+        self,
+        resume: ResumeDocument,
+    ):
+
+        self.db.delete(resume)
