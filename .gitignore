@@ -1,29 +1,68 @@
-# Python
-.venv/
-__pycache__/
-*.pyc
+# # Python
+# .venv/
+# __pycache__/
+# *.pyc
 
-# Environment
+# # Environment
+# .env
+
+# # IDE
+# .vscode/
+
+# # OS
+# .DS_Store
+# Thumbs.db
+
+# # Uploaded resumes
+# uploads/resumes/
+
+# # Python virtual environment
+# .venv/
+
+# # Python cache
+# __pycache__/
+# *.pyc
+
+# # Environment variables
+# .env
+
+# *.zip
+
+
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+backend/.venv/
+frontend/.venv/
+
+# Environment Variables
 .env
+.env.*
 
 # IDE
 .vscode/
+.idea/
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Uploaded resumes
-uploads/resumes/
+# Uploaded Files
+backend/uploads/resumes/
 
-# Python virtual environment
-.venv/
+# Build Files
+dist/
+build/
 
-# Python cache
-__pycache__/
-*.pyc
+# Logs
+*.log
 
-# Environment variables
-.env
-
+# Archives
 *.zip
