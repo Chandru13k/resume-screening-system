@@ -1,24 +1,28 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { Toaster } from "sonner";
 
 import App from "./App";
 
 import "./styles/globals.css";
-
-import { Toaster } from "sonner";
 
 ReactDOM.createRoot(
   document.getElementById("root")!
 ).render(
   <React.StrictMode>
 
-    <App />
+    <BrowserRouter>
 
-    <Toaster
-      position="top-right"
-      richColors
-      closeButton
-    />
+      <App />
+
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+      />
+
+    </BrowserRouter>
 
   </React.StrictMode>
 );
