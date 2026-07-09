@@ -97,3 +97,5 @@ class JobResponse(BaseModel):
     status: str
 
     is_active: bool
+
+    is_applied: bool = False

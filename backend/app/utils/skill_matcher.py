@@ -21,6 +21,16 @@ class SkillMatcher:
         jd_skills = SkillExtractor.extract(
             job_description
         )
+        print("\n========== ATS DEBUG ==========")
+        print("Job Description:")
+        print(job_description)
+
+        print("\nExtracted JD Skills:")
+        print(jd_skills)
+
+        print("\nCandidate Skills:")
+        print(candidate_skills)
+        print("===============================\n")
 
         jd_set = {
             skill.lower()

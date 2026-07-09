@@ -265,14 +265,14 @@ export default function CandidateDashboard() {
 
         <StatsCard
           title="Applications"
-          value="-"
+          value={dashboard.applications}
           color="text-purple-600"
           icon={<Send size={34} />}
         />
 
         <StatsCard
           title="Jobs Available"
-          value="-"
+          value={dashboard.jobs_available}
           color="text-orange-600"
           icon={<Briefcase size={34} />}
         />

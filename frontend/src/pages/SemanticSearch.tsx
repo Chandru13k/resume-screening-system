@@ -300,11 +300,7 @@ PostgreSQL, Docker, Redis and AWS experience...`}
                       >
 
                         <td className="px-4 py-4 font-medium">
-
-                          {candidate.name ??
-                            candidate.candidate_name ??
-                            `Candidate #${candidate.candidate_id}`}
-
+                          {candidate.full_name || `Candidate #${candidate.candidate_id}`}
                         </td>
 
                         <td className="px-4 py-4">

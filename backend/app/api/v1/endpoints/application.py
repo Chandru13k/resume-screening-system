@@ -25,7 +25,9 @@ from app.services.application_service import (
 )
 
 from app.repositories.job_repository import JobRepository
-
+from app.repositories.application_repository import (
+    ApplicationRepository,
+)
 
 router = APIRouter(
     prefix="/api/v1",
@@ -46,7 +48,34 @@ def browse_jobs(
     db: Session = Depends(get_db),
 ):
 
-    return JobRepository(db).get_active_jobs()
+    job_repo = JobRepository(db)
+
+    application_repo = ApplicationRepository(db)
+
+    jobs = job_repo.get_active_jobs()
+
+    applications = application_repo.get_by_candidate(
+        current_user.id,
+    )
+
+    applied_job_ids = {
+        app.job_id
+        for app in applications
+    }
+
+    response = []
+
+    for job in jobs:
+
+        item = JobResponse.model_validate(job)
+
+        item.is_applied = (
+            job.id in applied_job_ids
+        )
+
+        response.append(item)
+
+    return response
 
 
 # --------------------------------------------------

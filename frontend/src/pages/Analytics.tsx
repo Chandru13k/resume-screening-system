@@ -490,15 +490,13 @@ export default function Analytics() {
           </Card>
 
           <Card title="AI Ranking">
+            console.log(dashboard.ranking);
 
             <ScoreChart
-              data={dashboard.ranking.map(
-                (candidate) => ({
-                  name: `C${candidate.candidate_id}`,
-                  score:
-                    candidate.overall_score,
-                })
-              )}
+              data={dashboard.ranking.map((candidate: any) => ({
+                name: candidate.candidate_name,
+                score: candidate.overall_score,
+              }))}
             />
 
           </Card>

@@ -7,9 +7,7 @@ class CandidateDashboardService:
 
     def __init__(self, db):
 
-        self.repo = CandidateDashboardRepository(
-            db
-        )
+        self.repo = CandidateDashboardRepository(db)
 
     def dashboard(
         self,
@@ -25,5 +23,11 @@ class CandidateDashboardService:
             "resumes": self.repo.get_resumes(
                 candidate_id
             ),
+
+            "applications": self.repo.get_application_count(
+                candidate_id
+            ),
+
+            "jobs_available": self.repo.get_jobs_available_count(),
 
         }

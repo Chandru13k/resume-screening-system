@@ -72,6 +72,12 @@ class ApplicationRankingService:
 
             result["application_id"] = application.id
             result["candidate_id"] = application.candidate_id
+            result["candidate_name"] = (
+                application.candidate.candidate_profile.full_name
+                if application.candidate.candidate_profile
+                else f"Candidate #{application.candidate_id}"
+            )
+            result["candidate_email"] = application.candidate.email
             result["status"] = application.status
 
             candidates.append(result)

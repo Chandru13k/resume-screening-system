@@ -195,8 +195,6 @@
 
 
 
-
-
 import { useEffect, useMemo, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import Card from "../components/Card";
@@ -216,6 +214,7 @@ interface Job {
   salary_min: string | null;
   salary_max: string | null;
   description: string;
+  is_applied: boolean;
 }
 
 interface Resume {
@@ -226,8 +225,7 @@ interface Resume {
 export default function Jobs() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [resumes, setResumes] = useState<Resume[]>([]);
-  const [selectedResume, setSelectedResume] =
-    useState<number>();
+  const [selectedResume, setSelectedResume] = useState<number>();
 
   const [search, setSearch] = useState("");
 
@@ -235,20 +233,17 @@ export default function Jobs() {
 
   async function loadData() {
     try {
-      const [jobsRes, resumeRes] =
-        await Promise.all([
-          api.get("/candidate/jobs"),
-          api.get("/resumes"),
-        ]);
+      const [jobsRes, resumeRes] = await Promise.all([
+        api.get("/candidate/jobs"),
+        api.get("/resumes"),
+      ]);
 
       setJobs(jobsRes.data);
 
       setResumes(resumeRes.data);
 
       if (resumeRes.data.length > 0) {
-        setSelectedResume(
-          resumeRes.data[0].id
-        );
+        setSelectedResume(resumeRes.data[0].id);
       }
     } catch (err) {
       toast.error("Unable to load jobs.");
@@ -263,22 +258,26 @@ export default function Jobs() {
 
   async function apply(jobId: number) {
     if (!selectedResume) {
-      toast.warning(
-        "Please upload a resume first."
-      );
+      toast.warning("Please upload a resume first.");
       return;
     }
 
     try {
-      await api.post(
-        `/jobs/${jobId}/apply`,
-        {
-          resume_id: selectedResume,
-        }
-      );
+      await api.post(`/jobs/${jobId}/apply`, {
+        resume_id: selectedResume,
+      });
 
-      toast.success(
-        "Application submitted successfully."
+      toast.success("Application submitted successfully.");
+
+      setJobs((prev) =>
+        prev.map((job) =>
+          job.id === jobId
+            ? {
+                ...job,
+                is_applied: true,
+              }
+            : job
+        )
       );
     } catch (err: any) {
       toast.error(
@@ -328,9 +327,7 @@ export default function Jobs() {
           <select
             value={selectedResume}
             onChange={(e) =>
-              setSelectedResume(
-                Number(e.target.value)
-              )
+              setSelectedResume(Number(e.target.value))
             }
             className="w-full rounded-xl border border-slate-300 p-3 md:w-96"
           >
@@ -392,14 +389,27 @@ export default function Jobs() {
 
                 </div>
 
-                <button
-                  onClick={() =>
-                    apply(job.id)
-                  }
-                  className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:scale-105 hover:bg-blue-700"
-                >
-                  Apply Now
-                </button>
+                {job.is_applied ? (
+
+                  <button
+                    disabled
+                    className="cursor-not-allowed rounded-xl bg-green-600 px-6 py-3 font-semibold text-white"
+                  >
+                    ✓ Applied
+                  </button>
+
+                ) : (
+
+                  <button
+                    onClick={() =>
+                      apply(job.id)
+                    }
+                    className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:scale-105 hover:bg-blue-700"
+                  >
+                    Apply Now
+                  </button>
+
+                )}
 
               </div>
 
@@ -435,8 +445,7 @@ export default function Jobs() {
                 {job.description}
               </p>
 
-              {(job.salary_min ||
-                job.salary_max) && (
+              {(job.salary_min || job.salary_max) && (
 
                 <div className="mt-6 rounded-xl bg-green-50 p-4">
 
@@ -445,8 +454,7 @@ export default function Jobs() {
                   </p>
 
                   <p className="mt-1 text-lg font-bold text-green-600">
-                    ₹ {job.salary_min ?? "-"} —
-                    ₹ {job.salary_max ?? "-"}
+                    ₹ {job.salary_min ?? "-"} — ₹ {job.salary_max ?? "-"}
                   </p>
 
                 </div>

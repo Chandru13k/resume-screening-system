@@ -74,34 +74,20 @@ export default function Navbar() {
           </button>
 
           {open && (
+              <div className="absolute right-0 mt-3 w-56 overflow-hidden rounded-xl border bg-white shadow-xl">
 
-            <div className="absolute right-0 mt-3 w-56 overflow-hidden rounded-xl border bg-white shadow-xl">
-
-              <button
-                className="block w-full px-5 py-3 text-left hover:bg-slate-100"
-              >
-                👤 Profile
-              </button>
-
-              <button
-                className="block w-full px-5 py-3 text-left hover:bg-slate-100"
-              >
-                ⚙️ Settings
-              </button>
-
-              <button
-                onClick={() => {
+                <button
+                  onClick={() => {
                   localStorage.removeItem("token");
                   window.location.href = "/login";
-                }}
+                  }}
                 className="block w-full px-5 py-3 text-left text-red-600 hover:bg-red-50"
-              >
+                >
                 🚪 Logout
               </button>
 
-            </div>
-
-          )}
+              </div>
+            )}
 
         </div>
 

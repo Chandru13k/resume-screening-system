@@ -38,3 +38,7 @@ class CandidateDashboardResponse(BaseModel):
     profile: CandidateProfileResponse
 
     resumes: list[ResumeResponse]
+
+    applications: int
+
+    jobs_available: int
