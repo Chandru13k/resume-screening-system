@@ -55,7 +55,8 @@ frontend/.venv/
 Thumbs.db
 
 # Uploaded Files
-backend/uploads/resumes/
+backend/uploads/resumes/*
+!backend/uploads/resumes/.gitkeep
 
 # Build Files
 dist/
